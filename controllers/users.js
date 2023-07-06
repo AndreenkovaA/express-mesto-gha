@@ -32,7 +32,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then(user => res.send({ data: user }))
+    .then(user => res.status(201).send({ data: user }))
     .catch(err => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
@@ -61,7 +61,7 @@ module.exports.updateUserInfo = (req, res) => {
 };
 
 module.exports.updateAvatar = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, params(req.body).only(avatarParams), { new: true })
+  User.findByIdAndUpdate(req.user._id, params(req.body).only(avatarParams), { new: true, runValidators: true })
   .then(user => {
     if (user) {
       res.send({ data: user });
@@ -70,7 +70,7 @@ module.exports.updateAvatar = (req, res) => {
     }
   })
   .catch(err => {
-    if (err.name === 'CastError') {
+    if (err.name === 'CastError' || err.name === 'ValidationError') {
       res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
     } else {
       res.status(500).send({ message: 'Ошибка по умолчанию.' });
