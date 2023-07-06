@@ -30,7 +30,13 @@ module.exports.deleteCard = (req, res) => {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
       }
     })
-    .catch(err => res.status(500).send({ message: 'Ошибка по умолчанию.' }));
+    .catch(err => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Карточка с указанным _id не найдена.' });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчанию.' });
+      }
+    });
 };
 
 module.exports.likeCard = (req, res) => {
