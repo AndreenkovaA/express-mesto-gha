@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator(v) {
-        return /http(s|):\/\/(www.)?(([\w+\-\/:?#[\]$&'()*+@,;=.~!])?)+/.test(v);
+        return /http(s|):\/\/(www.)?(([\w+\-/:?#[\]$&'()*+@,;=.~!])?)+/.test(v);
       },
       message: (props) => `${props} не является корректной ссылкой!`,
       code: 400,

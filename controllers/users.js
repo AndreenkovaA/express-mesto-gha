@@ -5,6 +5,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
 const UnautorizedError = require('../errors/unautorized-err');
+// const DuplicateError = require('../errors/d')
 
 const userParams = ['name', 'about'];
 const avatarParams = ['avatar'];
@@ -26,8 +27,7 @@ module.exports.getUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        const e = new BadRequestError('Пользователь по указанному _id не найден.');
-        next(e);
+        next(new BadRequestError('Пользователь по указанному _id не найден.'));
       }
       next(err);
     });
@@ -59,7 +59,11 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(201).send({
+      data: {
+        name, about, avatar, email, id: user._id,
+      },
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         const e = new BadRequestError('Переданы некорректные данные при создании пользователя.');
