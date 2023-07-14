@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
-const UnautorizedError = require('../errors/unautorized-err');
+const DuplicateError = require('../errors/duplicate-err');
 
 const userParams = ['name', 'about'];
 const avatarParams = ['avatar'];
@@ -27,8 +27,9 @@ module.exports.getUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Пользователь по указанному _id не найден.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -45,8 +46,9 @@ module.exports.getUserInfo = (req, res, next) => {
       if (err.name === 'CastError') {
         const e = new BadRequestError('Пользователь по указанному _id не найден.');
         next(e);
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -67,13 +69,12 @@ module.exports.createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         const e = new BadRequestError('Переданы некорректные данные при создании пользователя.');
         next(e);
-      }
-      if (err.code === 11000) {
-        const e = new Error('Пользователь с такой почтой уже существует.');
-        e.statusCode = 409;
+      } else if (err.code === 11000) {
+        const e = new DuplicateError('Пользователь с такой почтой уже существует.');
         next(e);
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -94,8 +95,9 @@ module.exports.updateUserInfo = (req, res, next) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         const e = new BadRequestError('Переданы некорректные данные при обновлении профиля.');
         next(e);
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -116,8 +118,9 @@ module.exports.updateAvatar = (req, res, next) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         const e = new BadRequestError('Переданы некорректные данные при обновлении профиля.');
         next(e);
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -129,8 +132,5 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
       res.send({ token });
     })
-    .catch((err) => {
-      const e = new UnautorizedError(err.message);
-      next(e);
-    });
+    .catch(next);
 };

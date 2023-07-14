@@ -1,5 +1,6 @@
 const { ObjectId } = require('mongoose');
 const mongoose = require('mongoose');
+const LINK = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -13,7 +14,7 @@ const cardSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        return /http(s|):\/\/(www.)?(([\w+\-/:?#[\]$&'()*+@,;=.~!])?)+/.test(v);
+        return LINK.test(v);
       },
       message: (props) => `${props.value} не является корректной ссылкой!`,
     },
