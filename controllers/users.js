@@ -5,7 +5,6 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
 const UnautorizedError = require('../errors/unautorized-err');
-// const DuplicateError = require('../errors/d')
 
 const userParams = ['name', 'about'];
 const avatarParams = ['avatar'];

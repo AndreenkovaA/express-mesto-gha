@@ -26,9 +26,9 @@ app.post('/signin', celebrate({
 }), login);
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().uri(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(/http(s|):\/\/(www.)?(([\w+\-/:?#[\]$&'()*+@,;=.~!])?)+/),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
@@ -40,7 +40,9 @@ app.use(cardRouter);
 app.use(() => { throw new NotFoundError('Страница не найдена.'); });
 
 app.use(errors());
-app.use((err, req, res, next) => {
+
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, _next) => {
   const { statusCode = 500, message } = err;
 
   res
